@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Query Intelligence Endpoint</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c2c2c;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #0066cc;
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px 16px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background: #0052a3;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .loading {
+            display: none;
+            font-size: 13px;
+            color: #666;
+            margin-top: 12px;
+            animation: pulse 1.5s infinite;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .result-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .result-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .result-value {
+            font-size: 14px;
+            color: #1a1a1a;
+            padding: 8px 0;
+            word-break: break-word;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            color: #555;
+            margin: 2px 2px 2px 0;
+        }
+
+        .badge.sector {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge.geography {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge.entity {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .badge.attribute {
+            background: #f3e5f5;
+            color: #6a1b9a;
+        }
+
+        .history {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .history-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1a1a1a;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .history-item {
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border-left: 3px solid #0066cc;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .history-item:hover {
+            background: #f0f0f0;
+        }
+
+        .history-item-query {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item-id {
+            font-size: 11px;
+            color: #999;
+            font-family: monospace;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+            font-size: 13px;
+        }
+
+        .error {
+            padding: 12px;
+            background: #ffebee;
+            color: #c62828;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .success {
+            padding: 12px;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-radius: 4px;
+            font-size: 13px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .success.show {
+            display: block;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #999;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Query Intelligence</h1>
+            <p class="subtitle">Extract structured intelligence from natural language research queries</p>
+        </header>
+
+        <div class="main-content">
+            <!-- Create Query Card -->
+            <div class="card">
+                <h2 class="card-title">New Query</h2>
+                
+                <div class="form-group">
+                    <label for="query-input">Your Query</label>
+                    <textarea id="query-input" placeholder="e.g., find battery technology startups in Southeast Asia"></textarea>
+                </div>
+
+                <button onclick="submitQuery()">Extract Intelligence</button>
+                <div class="loading" id="loading">Processing...</div>
+
+                <div class="error" id="error"></div>
+                <div class="success" id="success">Query submitted successfully!</div>
+
+                <div class="result-section" id="result-section" style="display: none;">
+                    <div class="result-label">Extracted Data</div>
+
+                    <div style="margin-top: 12px;">
+                        <div class="result-label" style="margin-bottom: 4px;">Intent</div>
+                        <div class="result-value" id="result-intent"></div>
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <div class="result-label" style="margin-bottom: 4px;">Summary</div>
+                        <div class="result-value" id="result-summary"></div>
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <div class="result-label" style="margin-bottom: 4px;">Entities</div>
+                        <div id="result-entities"></div>
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <div class="result-label" style="margin-bottom: 4px;">Sectors</div>
+                        <div id="result-sectors"></div>
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <div class="result-label" style="margin-bottom: 4px;">Geographies</div>
+                        <div id="result-geographies"></div>
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <div class="result-label" style="margin-bottom: 4px;">Attributes</div>
+                        <div id="result-attributes"></div>
+                    </div>
+
+                    <div style="margin-top: 12px;">
+                        <div class="result-label" style="margin-bottom: 4px;">Query ID</div>
+                        <div class="result-value" id="result-id" style="font-family: monospace; font-size: 12px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Card -->
+            <div class="card">
+                <h2 class="card-title">Recent Queries</h2>
+                <div class="history-list" id="history-list">
+                    <div class="empty-state">No queries yet. Submit one to get started!</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Query Intelligence Endpoint v2.0 • <a href="https://github.com/dhwanibhut-sys/spark" style="color: #0066cc; text-decoration: none;">GitHub</a></p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000';
+        let queries = [];
+
+        // Load queries from localStorage on page load
+        window.addEventListener('load', () => {
+            loadQueries();
+        });
+
+        async function submitQuery() {
+            const query = document.getElementById('query-input').value.trim();
+            const errorEl = document.getElementById('error');
+            const successEl = document.getElementById('success');
+            const loadingEl = document.getElementById('loading');
+            const resultSection = document.getElementById('result-section');
+
+            // Clear messages
+            errorEl.classList.remove('show');
+            successEl.classList.remove('show');
+
+            if (!query) {
+                showError('Please enter a query');
+                return;
+            }
+
+            if (query.length < 3) {
+                showError('Query must be at least 3 characters');
+                return;
+            }
+
+            loadingEl.classList.add('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/queries`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query }),
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to process query');
+                }
+
+                const data = await response.json();
+
+                // Add to local queries list
+                queries.unshift(data);
+                localStorage.setItem('queries', JSON.stringify(queries));
+
+                // Display result
+                displayResult(data);
+                updateHistory();
+
+                // Clear input
+                document.getElementById('query-input').value = '';
+
+                // Show success
+                successEl.classList.add('show');
+                setTimeout(() => successEl.classList.remove('show'), 3000);
+
+            } catch (error) {
+                showError(error.message || 'Failed to process query');
+            } finally {
+                loadingEl.classList.remove('active');
+            }
+        }
+
+        function displayResult(data) {
+            const extracted = data.extracted;
+            const resultSection = document.getElementById('result-section');
+
+            document.getElementById('result-intent').textContent = extracted.search_intent;
+            document.getElementById('result-summary').textContent = extracted.summary;
+            document.getElementById('result-id').textContent = data.id;
+
+            document.getElementById('result-entities').innerHTML = extracted.entities
+                .map(e => `<span class="badge entity">${e}</span>`)
+                .join('');
+
+            document.getElementById('result-sectors').innerHTML = extracted.sectors
+                .map(s => `<span class="badge sector">${s}</span>`)
+                .join('');
+
+            document.getElementById('result-geographies').innerHTML = extracted.geographies
+                .map(g => `<span class="badge geography">${g}</span>`)
+                .join('');
+
+            document.getElementById('result-attributes').innerHTML = extracted.attributes.length > 0
+                ? extracted.attributes.map(a => `<span class="badge attribute">${a}</span>`).join('')
+                : '<span style="color: #999; font-size: 13px;">None</span>';
+
+            resultSection.style.display = 'block';
+        }
+
+        function updateHistory() {
+            const historyList = document.getElementById('history-list');
+
+            if (queries.length === 0) {
+                historyList.innerHTML = '<div class="empty-state">No queries yet. Submit one to get started!</div>';
+                return;
+            }
+
+            historyList.innerHTML = queries.map(q => `
+                <div class="history-item" onclick="loadQuery('${q.id}')">
+                    <div class="history-item-query">${q.query}</div>
+                    <div class="history-item-id">${q.id}</div>
+                </div>
+            `).join('');
+        }
+
+        function loadQuery(id) {
+            const query = queries.find(q => q.id === id);
+            if (query) {
+                displayResult(query);
+            }
+        }
+
+        function loadQueries() {
+            const stored = localStorage.getItem('queries');
+            if (stored) {
+                try {
+                    queries = JSON.parse(stored);
+                    updateHistory();
+                } catch (e) {
+                    console.error('Failed to load queries from localStorage', e);
+                }
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+        }
+
+        // Allow Enter key to submit
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('query-input').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    submitQuery();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
