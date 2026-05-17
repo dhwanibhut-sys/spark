@@ -1,8 +1,8 @@
 # Query Intelligence Endpoint
 
 - Built a FastAPI app with `POST /queries` and `GET /queries/{id}`.
-- `POST /queries` accepts a natural-language query, runs structured extraction through Anthropic when `ANTHROPIC_API_KEY` is set, stores the result in SQLite, and returns the saved record.
-- `GET /queries/{id}` reads the stored record back from SQLite.
+- `POST /queries` accepts a natural-language query, runs structured extraction through Anthropic when `ANTHROPIC_API_KEY` is set, persists the result to a local JSON file (`queries.json`), and returns the saved record.
+- `GET /queries/{id}` reads the stored record back from `queries.json`.
 - Added a small local fallback extractor so the app still works in development if no API key is present or the model response is unavailable.
 
 ## Run
