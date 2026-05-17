@@ -1,4 +1,4 @@
-# Query Intelligence Endpoint v2.0
+# Query Intelligence Endpoint 
 
 **An AI-powered research query extraction service with structured outputs, comprehensive testing, and production-grade reliability.**
 
