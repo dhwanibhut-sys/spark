@@ -1,0 +1,4 @@
+# Kept for backwards-compatibility with docs that reference requirements_v2.txt
+# The authoritative dependency list is requirements.txt
+-r requirements.txt
+

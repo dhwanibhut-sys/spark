@@ -1,0 +1,13 @@
+.git
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+htmlcov/
+.env
+queries.json
+*.db
+*.db-journal
+.vscode/
+.idea/
+

@@ -26,6 +26,8 @@ wheels/
 *~
 .DS_Store
 queries.json
+*.db
+*.db-journal
 .pytest_cache/
 .coverage
 htmlcov/

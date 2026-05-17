@@ -73,6 +73,15 @@ The API is now live at `http://localhost:8000`
 
 ---
 
+## Deploy (Docker)
+
+```bash
+docker build -t query-intel .
+docker run -p 8000:8000 -e ANTHROPIC_API_KEY="sk-ant-..." query-intel
+```
+
+---
+
 ## API Reference
 
 ### Health Check
